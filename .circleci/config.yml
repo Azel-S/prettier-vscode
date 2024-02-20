@@ -4,8 +4,13 @@ jobs:
     docker:
       - image: alpine:3.15
     steps:
+      - checkout 
       - run:
           name: The First Step
           command: |
-            echo 'Hello World!'
-            echo 'This is the delivery pipeline'
+            echo 'test'
+      - run: 
+          name: List files
+          commandL: |
+             ls -al
+          
