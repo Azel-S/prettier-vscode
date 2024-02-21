@@ -4,7 +4,6 @@ jobs:
     docker:
       - image: cimg/base:2021.04
     steps:
-      - checkout 
       - run:
           name: The First Step
           command: |
