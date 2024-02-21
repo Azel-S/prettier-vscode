@@ -4,12 +4,13 @@ jobs:
     docker:
       - image: cimg/base:2021.04
     steps:
+      - checkout
       - run:
           name: The First Step
           command: |
             echo 'test'
       - run: 
           name: List files
-          commandL: |
+          command: |
              ls -al
           
