@@ -165,6 +165,12 @@
           "default": "preserve",
           "markdownDescription": "%ext.config.forceObjectBreak%"
         },
+        "prettier.keepParentheses": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "%ext.config.keepParentheses%"
+        },
         "prettier.disableLanguages": {
           "type": "array",
           "items": {
