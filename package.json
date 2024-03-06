@@ -188,6 +188,12 @@
           "markdownDescription": "%ext.config.allmanStyle%",
           "scope": "resource"
         },
+        "prettier.getSetOneLine": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "%ext.config.getSetOneLine%",
+          "scope": "resource"
+        },
         "prettier.elseStatementNewLine": {
           "type": "boolean",
           "default": true,

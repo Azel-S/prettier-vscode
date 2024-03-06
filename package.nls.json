@@ -6,6 +6,7 @@
   "ext.config.arrowParens": "Include parentheses around a sole arrow function parameter.",
   "ext.config.bracketSpacing": "Controls the printing of spaces inside object literals.",
   "ext.config.configPath": "Path to the prettier configuration file.",
+  "ext.config.getSetOneLine": "Put getters/setters on one line (if they're short enough)",
   "ext.config.disableLanguages": "A list of languages IDs to disable this extension on.",
   "ext.config.disableLanguagesDeprecation": "This feature is no longer supported. Instead, configure VS Code [default formatters](https://github.com/prettier/prettier-vscode#default-formatter) or use .prettierignore.",
   "ext.config.elseStatementNewLine": "puts else statement on a new line instead of on the same line as if statement right bracket.",
