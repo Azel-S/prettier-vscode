@@ -188,6 +188,12 @@
           "markdownDescription": "%ext.config.allmanStyle%",
           "scope": "resource"
         },
+        "prettier.classMemberOrder": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "%ext.config.classMemberOrder%",
+          "scope": "resource"
+        },
         "prettier.elseStatementNewLine": {
           "type": "boolean",
           "default": true,
