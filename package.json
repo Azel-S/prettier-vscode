@@ -189,8 +189,13 @@
           "scope": "resource"
         },
         "prettier.classMemberOrder": {
-          "type": "boolean",
-          "default": false,
+          "type": "string",
+          "enum": [
+            "none",
+            "private first",
+            "public first"
+          ],
+          "default": "none",
           "markdownDescription": "%ext.config.classMemberOrder%",
           "scope": "resource"
         },
