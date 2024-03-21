@@ -1,14 +1,14 @@
+import { PrettierOptions } from "./types";
+
 enum LineType {
     EMPTY = "empty",
     COMMENT_ONLY = "commentOnly",
     CODE_ONLY = "codeOnly",
     COMMENT_AND_CODE = "commentAndCode",
-    PART_OF_MULTILINE_COMMENT = "partOfMultilineComment",
 }
 
 interface LineMetrics {
     lineLength: number;
-    idCount: number;
     openBrackCount: number;
     memAccessCount: number;
     lineType: LineType;
@@ -16,21 +16,19 @@ interface LineMetrics {
 
 class Line {
     lineNum: number;
-    lineText?: string; // Optional
     metrics: LineMetrics;
 
     constructor(lineNum: number, metrics: LineMetrics, lineText?: string) {
         this.lineNum = lineNum;
-        this.lineText = lineText; // Again, this is optional. Depends on if we wanna store the text
         this.metrics = metrics;
     }
 }
 
-export function getAnalysis(text: string) {
-    return analyzeMetrics(getMetrics(text));
+export function getAnalysis(text: string, options: Partial<PrettierOptions>) {
+    return analyzeMetrics(getMetrics(text, options), options);
 }
 
-function getMetrics(text: string): Array<Line> {
+function getMetrics(text: string, options: Partial<PrettierOptions>): Array<Line> {
     let metrics = new Array<Line>;
 
     let lines = text.split('\n');
@@ -65,10 +63,60 @@ function getLineType(line: string): LineType {
 }
 
 // TODO: doooo
-function analyzeMetrics(metrics: Array<Line>) {
-    let result = "Code Metrics";
-    result += "\n";
-    result += "This code is so good, I wanna start a religion off of it!";
+function analyzeMetrics(metrics: Array<Line>, options: Partial<PrettierOptions>) {
+    let result: string = "cool code dude :D";
+    
+    if (options.allmanStyle) {
+        return "allman style is on";
+    } else {
+        return "allman style is off";
+    }
+
+    /*
+    let totalLines = metrics.length;
+    //average metrics
+    let totalLineLength = 0;
+    let totalOpenBrackets = 0;
+    let totalMemAccess = 0;
+    //ratio metrics
+    let emptyLines = 0;
+    let commentOnlyLines = 0;
+    let codeOnlyLines = 0;
+    let commentAndCodeLines = 0;
+
+    for (let i = 0; i < metrics.length; i++) {
+        const line = metrics[i];
+        totalLineLength += line.metrics.lineLength;
+        totalOpenBrackets += line.metrics.openBrackCount;
+        totalMemAccess += line.metrics.memAccessCount;
+
+        switch (line.metrics.lineType) {
+            case LineType.EMPTY:
+                emptyLines++;
+                break;
+            case LineType.COMMENT_ONLY:
+                commentOnlyLines++;
+                break;
+            case LineType.CODE_ONLY:
+                codeOnlyLines++;
+                break;
+            case LineType.COMMENT_AND_CODE:
+                commentAndCodeLines++;
+                break;
+        }
+    }
+
+    let averageLineLength = totalLineLength / totalLines;
+    let averageOpenBrackets = totalOpenBrackets / totalLines;
+    let averageMemAccess = totalMemAccess / totalLines;
+
+    //comparing empty lines to everything else (taking account of lines that have comments and/or code)
+    let emptyLineToCodeRatio = emptyLines / (codeOnlyLines + commentAndCodeLines + commentOnlyLines);
+
+    //comparing lines of comments to solely lines of code
+    let commentToCodeRatio = commentOnlyLines / codeOnlyLines;
+    */
+    
 
     return result;
 }

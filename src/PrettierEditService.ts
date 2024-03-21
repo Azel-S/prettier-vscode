@@ -147,9 +147,94 @@ export default class PrettierEditService implements Disposable {
         return;
       }
 
+      const { fileName, uri, languageId } = editor.document;
+      const vscodeConfig = getConfig(uri);
+      
+      const resolvedConfig = await this.moduleResolver.getResolvedConfig(editor.document, vscodeConfig);
+      if (resolvedConfig === "error") {
+        this.statusBar.update(FormatterStatus.Error);
+        return;
+      }
+      if (resolvedConfig === "disabled") {
+        this.statusBar.update(FormatterStatus.Disabled);
+        return;
+      }
+
+      const prettierInstance = await this.moduleResolver.getPrettierInstance(
+        fileName
+      );
+      this.loggingService.logInfo("PrettierInstance:", prettierInstance);
+
+      if (!prettierInstance) {
+        this.loggingService.logError(
+          "Prettier could not be loaded. See previous logs for more information."
+        );
+        this.statusBar.update(FormatterStatus.Error);
+        return;
+      }
+
+      let resolvedIgnorePath: string | undefined;
+      if (vscodeConfig.ignorePath) {
+        resolvedIgnorePath = await this.moduleResolver.getResolvedIgnorePath(
+          fileName,
+          vscodeConfig.ignorePath
+      );
+        if (resolvedIgnorePath) {
+          this.loggingService.logInfo(
+            `Using ignore file (if present) at ${resolvedIgnorePath}`
+          );
+        }
+    } 
+
+      let fileInfo: PrettierFileInfoResult | undefined;
+      if   (fileName) {
+        fileInfo = await prettierInstance.getFileInfo(fileName, {
+          ignorePath: resolvedIgnorePath,
+          plugins: resolvedConfig?.plugins?.filter(
+            (item): item is string => typeof item === "string"
+          ),
+          resolveConfig: true,
+        withNodeModules: vscodeConfig.withNodeModules,
+      });
+      this.loggingService.logInfo("File Info:", fileInfo);
+    }
+
+    let parser: PrettierBuiltInParserName | string | undefined;
+    if (fileInfo && fileInfo.inferredParser) {
+      parser = fileInfo.inferredParser;
+    } else if (languageId !== "plaintext") {
+      // Don't attempt VS Code language for plaintext because we never have
+      // a formatter for plaintext and most likely the reason for this is
+      // somebody has registered a custom file extension without properly
+      // configuring the parser in their prettier config.
+      this.loggingService.logWarning(
+        `Parser not inferred, trying VS Code language.`
+      );
+      const { languages } = await prettierInstance.getSupportInfo({
+        plugins: [],
+      });
+      parser = getParserFromLanguageId(languages, uri, languageId);
+    }
+
+    if (!parser) {
+      this.loggingService.logError(
+        `Failed to resolve a parser, skipping file. If you registered a custom file extension, be sure to configure the parser.`
+      );
+      this.statusBar.update(FormatterStatus.Error);
+      return;
+    }
+
+      const options = this.getPrettierOptions(
+        editor.document.fileName,
+        parser as PrettierBuiltInParserName,
+        vscodeConfig,
+        resolvedConfig,
+        {force: false}
+      );
+
       // getAnalysis does the heavy lifting.
       workspace.openTextDocument({
-        content: getAnalysis(editor.document.getText()),
+        content: getAnalysis(editor.document.getText(), options),
         language: "text"
       }).then(document => {
         window.showTextDocument(document);
@@ -550,7 +635,7 @@ export default class PrettierEditService implements Disposable {
 
     const vsOpts: PrettierOptions = {};
     if (fallbackToVSCodeConfig) {
-      vsOpts.matrixArray = vsCodeConfig.matrixArray;
+      //vsOpts.matrixArray = vsCodeConfig.matrixArray;
       vsOpts.forceObjectBreak = vsCodeConfig.forceObjectBreak;
       vsOpts.allmanStyle = vsCodeConfig.allmanStyle;
       vsOpts.arrowParens = vsCodeConfig.arrowParens;
