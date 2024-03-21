@@ -489,6 +489,11 @@
         "command": "prettier.forceFormatDocument",
         "title": "%ext.command.forceFormatDocument.title%",
         "when": "editorFocus"
+      },
+      {
+        "command": "prettier.analyzeDocument",
+        "title": "%ext.command.analyzeDocument.title%",
+        "when": "editorFocus"
       }
     ]
   },

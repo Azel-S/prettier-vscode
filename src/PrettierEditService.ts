@@ -27,6 +27,7 @@ import {
 } from "./types";
 import { getConfig, isAboveV3 } from "./util";
 import { PrettierInstance } from "./PrettierInstance";
+import { getAnalysis } from "./analyzeDocument";
 
 interface ISelectors {
   rangeLanguageSelector: ReadonlyArray<DocumentFilter>;
@@ -72,7 +73,7 @@ export default class PrettierEditService implements Disposable {
     private moduleResolver: ModuleResolverInterface,
     private loggingService: LoggingService,
     private statusBar: StatusBar
-  ) {}
+  ) { }
 
   public registerDisposables(): Disposable[] {
     const packageWatcher = workspace.createFileSystemWatcher("**/package.json");
@@ -133,6 +134,29 @@ export default class PrettierEditService implements Disposable {
       });
     } catch (e) {
       this.loggingService.logError("Error formatting document", e);
+    }
+  };
+
+  public analyzeDocument = async () => {
+    try {
+      const editor = window.activeTextEditor;
+      if (!editor) {
+        this.loggingService.logInfo(
+          "No active document. Nothing was formatted."
+        );
+        return;
+      }
+
+      // getAnalysis does the heavy lifting.
+      workspace.openTextDocument({
+        content: getAnalysis(editor.document.getText()),
+        language: "text"
+      }).then(document => {
+        window.showTextDocument(document);
+      });
+
+    } catch (e) {
+      this.loggingService.logError("Error analyzing document", e);
     }
   };
 
@@ -310,20 +334,20 @@ export default class PrettierEditService implements Disposable {
       ? this.allExtensions.length === 0
         ? []
         : [
-            {
-              pattern: `${uri.fsPath}/**/*.{${this.allExtensions
-                .map((e) => e.substring(1))
-                .join(",")}}`,
-              scheme: "file",
-            },
-          ]
+          {
+            pattern: `${uri.fsPath}/**/*.{${this.allExtensions
+              .map((e) => e.substring(1))
+              .join(",")}}`,
+            scheme: "file",
+          },
+        ]
       : [];
 
     const customLanguageSelectors: DocumentFilter[] = uri
       ? documentSelectors.map((pattern) => ({
-          pattern: `${uri.fsPath}/${pattern}`,
-          scheme: "file",
-        }))
+        pattern: `${uri.fsPath}/${pattern}`,
+        scheme: "file",
+      }))
       : [];
 
     const defaultLanguageSelectors: DocumentFilter[] = [
