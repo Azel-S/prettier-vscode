@@ -111,7 +111,7 @@ function analyzeMetrics(metrics: Array<Line>, options: Partial<PrettierOptions>)
     let averageMemAccess = totalMemAccess / totalLines;
 
     //comparing empty lines to everything else (taking account of lines that have comments and/or code)
-    let emptyLineToCodeRatio = emptyLines / (codeOnlyLines + commentAndCodeLines + commentOnlyLines);
+    let whitespaceRatio = emptyLines / (codeOnlyLines + commentAndCodeLines + commentOnlyLines);
 
     //comparing lines of comments to solely lines of code
     let commentToCodeRatio = commentOnlyLines / codeOnlyLines;

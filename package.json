@@ -282,6 +282,36 @@
           "markdownDescription": "%ext.config.printWidth%",
           "scope": "resource"
         },
+        "prettier.lineLengthRead": {
+          "type": "integer",
+          "default": 50,
+          "markdownDescription": "%ext.config.lineLengthRead%",
+          "scope": "resource"
+        },
+        "prettier.nestingCountRead": {
+          "type": "integer",
+          "default": 3,
+          "markdownDescription": "%ext.config.nestingCountRead%",
+          "scope": "resource"
+        },
+        "prettier.memAccessRead": {
+          "type": "integer",
+          "default": 5,
+          "markdownDescription": "%ext.config.memAccessRead%",
+          "scope": "resource"
+        },
+        "prettier.commentToCodeRatioRead": {
+          "type": "number",
+          "default": 0.3,
+          "markdownDescription": "%ext.config.commentToCodeRatioRead%",
+          "scope": "resource"
+        },
+        "prettier.whitespaceRatioRead": {
+          "type": "number",
+          "default": 0.3,
+          "markdownDescription": "%ext.config.whitespaceRatioRead%",
+          "scope": "resource"
+        },
         "prettier.tabWidth": {
           "type": "integer",
           "default": 2,
