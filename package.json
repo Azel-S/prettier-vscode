@@ -290,19 +290,19 @@
           "scope": "resource"
         },
         "prettier.lineLengthRead": {
-          "type": "integer",
+          "type": "number",
           "default": 50,
           "markdownDescription": "%ext.config.lineLengthRead%",
           "scope": "resource"
         },
         "prettier.nestingCountRead": {
-          "type": "integer",
+          "type": "number",
           "default": 3,
           "markdownDescription": "%ext.config.nestingCountRead%",
           "scope": "resource"
         },
         "prettier.memAccessRead": {
-          "type": "integer",
+          "type": "number",
           "default": 5,
           "markdownDescription": "%ext.config.memAccessRead%",
           "scope": "resource"
