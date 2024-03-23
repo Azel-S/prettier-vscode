@@ -210,7 +210,8 @@
         "prettier.retainBlankLines": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "%ext.config.retainBlankLines%"
+          "markdownDescription": "%ext.config.retainBlankLines%",
+          "scope": "resource"
         },
         "prettier.selectorsSameLine": {
           "type": "boolean",
