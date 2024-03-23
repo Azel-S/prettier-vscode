@@ -130,7 +130,8 @@
     "prettier": "https://gitpkg.now.sh/OpenMindedPrettier/prettier/dist?main",
     "resolve": "^1.22.8",
     "semver": "^7.5.2",
-    "vscode-nls": "^5.2.0"
+    "vscode-nls": "^5.2.0",
+    "yarn": "^1.22.21"
   },
   "capabilities": {
     "virtualWorkspaces": true,
@@ -206,6 +207,10 @@
           "markdownDescription": "%ext.config.multiEmptyLine%",
           "scope": "resource"
         },
+        "prettier.retainBlankLines": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "%ext.config.retainBlankLines%",
         "prettier.selectorsSameLine": {
           "type": "boolean",
           "default": false,
