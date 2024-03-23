@@ -175,6 +175,12 @@
           "markdownDescription": "%ext.config.disableLanguages%",
           "scope": "window"
         },
+        "prettier.matrixArray": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "%ext.config.allmanStyle%",
+          "scope": "resource"
+        },
         "prettier.documentSelectors": {
           "type": "array",
           "items": {
@@ -205,6 +211,10 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "%ext.config.retainBlankLines%",
+        "prettier.selectorsSameLine": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "%ext.config.selectorsSameLine%",
           "scope": "resource"
         },
         "prettier.enable": {
