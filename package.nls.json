@@ -12,6 +12,7 @@
   "ext.config.elseStatementNewLine": "puts else statement on a new line instead of on the same line as if statement right bracket.",
   "ext.config.multiEmptyLine": "allow empty multi-line at the start and the end of blocks",
   "ext.config.classMemberOrder": "Print private/public class members before public/private ones",
+  "ext.config.retainBlankLines": "keeps multiple blank lines instead of collapsing into a single blank line",
   "ext.config.selectorsSameLine": "allow multiple css selectors to be on the same line",
   "ext.config.documentSelectors": "A list of [glob patterns](https://code.visualstudio.com/api/references/vscode-api#GlobPattern) to register Prettier formatter.",
   "ext.config.endOfLine": "Specify the end of line used by prettier.",
