@@ -35,6 +35,8 @@
   "ext.config.memAccessRead": "Set max threshold for number of member access operators ('.', '->', etc.) in readability analysis.",
   "ext.config.commentToCodeRatioRead": "Set max threshold for comment to code ratio in readability analysis.",
   "ext.config.whitespaceRatioRead": "Set max threshold for empty line to written line ratio in readability analysis.",
+  "ext.config.IDCountRead": "Set max threshold for number of identifiers in readability analysis.",
+  "xt.config.IDMinLengthRead": "Set max threshold for minimum identifier length in readability analysis.",
   "ext.config.proseWrap": "(Markdown) wrap prose over multiple lines.",
   "ext.config.quoteProps": "Change when properties in objects are quoted.\nValid options:\n- `\"as-needed\"` - Only add quotes around object properties where required.\n- `\"consistent\"` - If at least one property in an object requires quotes, quote all properties.\n- `\"preserve\"` - Respect the input use of quotes in object properties.",
   "ext.config.requireConfig": "Require a prettier configuration file to format. See [documentation for valid configuration files](https://prettier.io/docs/en/configuration.html).\n\n> _Note, untitled files will still be formatted using the VS Code prettier settings even when this setting is set._",

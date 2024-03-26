@@ -319,6 +319,18 @@
           "markdownDescription": "%ext.config.whitespaceRatioRead%",
           "scope": "resource"
         },
+        "prettier.IDCountRead": {
+          "type": "number",
+          "default": 4,
+          "markdownDescription": "%ext.config.IDCountRead%",
+          "scope": "resource"
+        },
+        "prettier.IDMinLengthRead": {
+          "type": "number",
+          "default": 2,
+          "markdownDescription": "%ext.config.IDMinLengthRead%",
+          "scope": "resource"
+        },
         "prettier.tabWidth": {
           "type": "integer",
           "default": 2,
