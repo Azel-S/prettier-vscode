@@ -11,6 +11,7 @@ interface LineMetrics {
     lineLength: number;
     openBrackCount: number;
     memAccessCount: number;
+    idCount: number;
     lineType: LineType;
 }
 
@@ -35,9 +36,9 @@ function getMetrics(text: string, options: Partial<PrettierOptions>): Array<Line
     for (let i = 0; i < lines.length; i++) {
         let metric = {
             lineLength: lines[i].length,
-            idCount: i,
             openBrackCount: getOpenBracketsCount(lines[i]),
             memAccessCount: getMemAccessCount(lines[i]),
+            idCount: getIDCount(lines[i]),
             lineType: getLineType(lines[i])
         }
 
@@ -45,6 +46,11 @@ function getMetrics(text: string, options: Partial<PrettierOptions>): Array<Line
     }
 
     return metrics;
+}
+
+// TODO: d
+function getIDCount(line: string): number {
+    return line.length - line.length;
 }
 
 // TODO: do
@@ -78,6 +84,7 @@ function analyzeMetrics(metrics: Array<Line>, options: Partial<PrettierOptions>)
     let totalLineLength = 0;
     let totalOpenBrackets = 0;
     let totalMemAccess = 0;
+    let totalIDCount = 0;
     //ratio metrics
     let emptyLines = 0;
     let commentOnlyLines = 0;
@@ -109,6 +116,7 @@ function analyzeMetrics(metrics: Array<Line>, options: Partial<PrettierOptions>)
     let averageLineLength = totalLineLength / totalLines;
     let averageOpenBrackets = totalOpenBrackets / totalLines;
     let averageMemAccess = totalMemAccess / totalLines;
+    let averageIDCount = totalIDCount / totalLines;
 
     //comparing empty lines to everything else (taking account of lines that have comments and/or code)
     let whitespaceRatio = emptyLines / (codeOnlyLines + commentAndCodeLines + commentOnlyLines);
