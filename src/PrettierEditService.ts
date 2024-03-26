@@ -652,6 +652,13 @@ export default class PrettierEditService implements Disposable {
       vsOpts.jsxBracketSameLine = vsCodeConfig.jsxBracketSameLine;
       vsOpts.jsxSingleQuote = vsCodeConfig.jsxSingleQuote;
       vsOpts.printWidth = vsCodeConfig.printWidth;
+      vsOpts.lineLengthRead = vsCodeConfig.lineLengthRead;
+      vsOpts.nestingCountRead = vsCodeConfig.nestingCountRead;
+      vsOpts.memAccessRead = vsCodeConfig.memAccessRead;
+      vsOpts.commentToCodeRatioRead = vsCodeConfig.commentToCodeRatioRead;
+      vsOpts.whitespaceRatioRead = vsCodeConfig.whitespaceRatioRead;
+      vsOpts.IDCountRead = vsCodeConfig.IDCountRead;
+      vsOpts.IDMinLengthRead = vsCodeConfig.IDMinLengthRead;
       vsOpts.proseWrap = vsCodeConfig.proseWrap;
       vsOpts.quoteProps = vsCodeConfig.quoteProps;
       vsOpts.requirePragma = vsCodeConfig.requirePragma;
