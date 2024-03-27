@@ -31,11 +31,11 @@ class Line {
 }
 
 export function getAnalysis(text: string, options: Partial<PrettierOptions>) {
-    return analyzeMetrics(getMetrics(text, options), options);
+    let metricInstance = new Metric(); 
+    return metricInstance.analyzeMetrics(metricInstance.getMetrics(text, options), options);
 }
 
-class metric {
-    
+class Metric {
     withinMultiLineComment: boolean; 
 
     constructor() {
@@ -44,20 +44,18 @@ class metric {
 
     
     getMetrics(text: string, options: Partial<PrettierOptions>): Array<Line> {
-        let metrics = new Array<Line>;
-        let withinMultiLineComment: boolean = false;
-    
+        let metrics = new Array<Line>;    
     
         let lines = text.split('\n');
         for (let i = 0; i < lines.length; i++) {
             let metric = {
                 lineLength: lines[i].length,
-                openBrackCount: getOpenBracketsCount(lines[i]),
-                memAccessCount: getMemAccessCount(lines[i]),
-                idCount: getIDCount(lines[i]),
-                lineType: getLineType(lines[i]),
-                idBad: getIDState(lines[i], options),
-                ids: getIDs(lines[i]),
+                openBrackCount: this.getOpenBracketsCount(lines[i]),
+                memAccessCount: this.getMemAccessCount(lines[i]),
+                idCount: this.getIDCount(lines[i]),
+                lineType: this.getLineType(lines[i]),
+                idBad: this.getIDState(lines[i], options),
+                ids: this.getIDs(lines[i]),
             };
     
             metrics.push(new Line(i + 1, metric, lines[i]));
@@ -67,33 +65,33 @@ class metric {
     }
     
     // TODO: d
-    function getIDCount(line: string): number {
+    getIDCount(line: string): number {
         return line.length - line.length;
     }
     
     // checks that IDs are of a valid length
-    function getIDState(line: string, options: Partial<PrettierOptions>): boolean {
+    getIDState(line: string, options: Partial<PrettierOptions>): boolean {
         //use options.IDMinLengthRead for checking. True means ID is longer than min length
         return false;
     }
     
     //stores ids in an array
-    function getIDs(line: string): Array<string> {
+    getIDs(line: string): Array<string> {
         return [];
     }
     
     // TODO: do
-    function getOpenBracketsCount(line: string): number {
+    getOpenBracketsCount(line: string): number {
         return line.length - line.length;
     }
     
     // TODO: doo
-    function getMemAccessCount(line: string): number {
+    getMemAccessCount(line: string): number {
         return line.length - line.length;
     }
     
     // TODO: dooo
-    function getLineType(line: string): LineType {
+    getLineType(line: string): LineType {
         /*
         EMPTY = "empty",
         COMMENT_ONLY = "commentOnly",
@@ -101,34 +99,40 @@ class metric {
         COMMENT_AND_CODE = "commentAndCode",
         */
     
-        // using regex 
-        /*
-    
-        if getsize == 0  : EMPTY
-        
-        boolean hasComment :  
-    
-        */
-    
-        
-    
-        if (line.length == 0){
+
+
+        if (this.withinMultiLineComment){
+            return LineType.COMMENT_ONLY; 
+        }
+        else if (line.length == 0){
             return LineType.EMPTY;
         }
-    
-        const lineWithoutStrings: string = line.replace(/'[^']*'|"[^"]*"/g, "");
+        
+        
+        
+
+
+        const findCodeRegex = /^(?!\s*\/\/)(?!\s*$).+/;
+        const hasCode: boolean = findCodeRegex.test(line);
+
+        const lineWithoutLiterals: string = line.replace(/'[^']*'|"[^"]*"/g, "");
         const findCommentRegex = /\/\/.*/;
-        const hasComment : boolean = findCommentRegex.test(lineWithoutStrings);
+        const hasComment : boolean = findCommentRegex.test(lineWithoutLiterals);
     
-    
-    
-    
-    
+        if (hasCode && hasComment){
+            return LineType.COMMENT_AND_CODE;
+        }
+        else if (hasCode){
+            return LineType.CODE_ONLY; 
+        }
+        else if (hasComment){
+            return LineType.COMMENT_ONLY;
+        }
         return LineType.EMPTY;
     }
     
     // TODO: doooo
-    function analyzeMetrics(metrics: Array<Line>, options: Partial<PrettierOptions>) {
+    analyzeMetrics(metrics: Array<Line>, options: Partial<PrettierOptions>) {
         let result: string = "";
     
         let totalLines = metrics.length;
