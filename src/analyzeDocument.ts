@@ -57,6 +57,8 @@ class Metric {
                 idBad: this.getIDState(lines[i], options),
                 ids: this.getIDs(lines[i]),
             };
+
+            console.log(metric.lineType);
     
             metrics.push(new Line(i + 1, metric, lines[i]));
         }
@@ -90,33 +92,39 @@ class Metric {
         return line.length - line.length;
     }
     
-    // TODO: dooo
     getLineType(line: string): LineType {
-        /*
-        EMPTY = "empty",
-        COMMENT_ONLY = "commentOnly",
-        CODE_ONLY = "codeOnly",
-        COMMENT_AND_CODE = "commentAndCode",
-        */
-    
 
-
-        if (this.withinMultiLineComment){
-            return LineType.COMMENT_ONLY; 
-        }
-        else if (line.length == 0){
-            return LineType.EMPTY;
-        }
-        
-        
-        
-
-
-        const findCodeRegex = /^(?!\s*\/\/)(?!\s*$).+/;
+        const findCodeRegex = /^(?!\s*\/\/)(?!\s*$)(?!\s*\/\*\s*\*\/)(?!\s*\/\*\s*)(?!\s*\*\/).+/;
         const hasCode: boolean = findCodeRegex.test(line);
 
-        const lineWithoutLiterals: string = line.replace(/'[^']*'|"[^"]*"/g, "");
         const findCommentRegex = /\/\/.*/;
+
+       // multi-line comment
+       if (line.includes("/*") && line.includes("*/")){
+            if (hasCode) {return LineType.COMMENT_AND_CODE}
+            return LineType.COMMENT_ONLY;
+       }
+       else if (line.includes("/*")){
+            this.withinMultiLineComment = true; 
+
+            if (hasCode){ return LineType.COMMENT_AND_CODE; }
+            return LineType.COMMENT_ONLY;
+       }
+       else if (line.includes("*/")){
+            this.withinMultiLineComment = false; 
+            if (hasCode) { return LineType.COMMENT_AND_CODE; }
+            return LineType.COMMENT_ONLY;
+       }
+       else if (this.withinMultiLineComment){
+           return LineType.COMMENT_ONLY; 
+        }
+        
+        // single-line comment
+        if (line.length == 0){
+            return LineType.EMPTY;
+        }
+
+        const lineWithoutLiterals: string = line.replace(/'[^']*'|"[^"]*"/g, "");
         const hasComment : boolean = findCommentRegex.test(lineWithoutLiterals);
     
         if (hasCode && hasComment){
