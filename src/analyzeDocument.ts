@@ -1,5 +1,5 @@
 import { PrettierOptions } from "./types";
-
+import { window } from "vscode"
 
 
 
@@ -28,6 +28,8 @@ class Line {
         this.lineNum = lineNum;
         this.metrics = metrics;
     }
+
+
 }
 
 export function getAnalysis(text: string, options: Partial<PrettierOptions>) {
@@ -37,9 +39,11 @@ export function getAnalysis(text: string, options: Partial<PrettierOptions>) {
 
 class Metric {
     withinMultiLineComment: boolean; 
+    currentLineIdArray: Array<string>;
 
     constructor() {
         this.withinMultiLineComment = false; 
+        this.currentLineIdArray = []; 
     }
 
     
@@ -51,35 +55,78 @@ class Metric {
             let metric = {
                 lineLength: lines[i].length,
                 openBrackCount: this.getOpenBracketsCount(lines[i]),
+                ids: this.getIDs(lines[i]),
                 memAccessCount: this.getMemAccessCount(lines[i]),
                 idCount: this.getIDCount(lines[i]),
                 lineType: this.getLineType(lines[i]),
-                idBad: this.getIDState(lines[i], options),
-                ids: this.getIDs(lines[i]),
+                idBad: this.getIDState(lines[i], options)
             };
 
-            console.log(metric.lineType);
-    
             metrics.push(new Line(i + 1, metric, lines[i]));
         }
+
+        this.currentLineIdArray.length = 0; 
     
         return metrics;
     }
     
-    // TODO: d
     getIDCount(line: string): number {
-        return line.length - line.length;
+        return this.currentLineIdArray.length;
     }
     
     // checks that IDs are of a valid length
     getIDState(line: string, options: Partial<PrettierOptions>): boolean {
         //use options.IDMinLengthRead for checking. True means ID is longer than min length
+
+        for (const value of this.currentLineIdArray){
+            if (options.IDMinLengthRead != undefined &&  value.length < options.IDMinLengthRead){
+                return true;
+            }
+        }
+        
         return false;
     }
     
     //stores ids in an array
     getIDs(line: string): Array<string> {
-        return [];
+        const fileExtension = window.activeTextEditor?.document.languageId; 
+        let ids: Array<string> = [];
+
+        if (fileExtension === "typescript"){
+
+            // multi var declaration on same line with let, const, var
+            // const multiDecIdRegex = 
+
+            // covers let, const, var, function, private, public, protected
+            const declarationIdRegex = /\b(let|const|var)\s+(\w+)|\bfunction\s+(\w+)|\b(public|private|protected)?\s*function\s+(\w+)|\b(public|private|protected)\s+(\w+)/;
+            
+            let match;
+            if ((match = declarationIdRegex.exec(line)) !== null ){
+                if (match[2] != undefined){
+                    ids.push(match[2]);
+                }
+                else if(match[3] != undefined){
+                    ids.push(match[3]);
+                }
+                else if(match[7] != undefined){
+                    ids.push(match[7]);
+                }
+            }
+
+            // e.g. const { fileName, uri, languageId } = doc;
+            const destructAssignRegex = /(?:const|let|var)\s+{([^}]+)}/;
+
+            const destructMatch = destructAssignRegex.exec(line);
+            if (destructMatch){
+                ids = ids.concat(destructMatch[1].split(',').map(id => id.trim()));
+            }
+        }
+        else if (fileExtension === "javascript"){
+
+        }
+        
+        this.currentLineIdArray = Object.assign([], ids); 
+        return ids.filter(Boolean);
     }
     
     // TODO: do
