@@ -37,6 +37,17 @@ export function getAnalysis(text: string, options: Partial<PrettierOptions>) {
     return metricInstance.analyzeMetrics(metricInstance.getMetrics(text, options), options);
 }
 
+function percentile(arr: number[], p: number): number {
+    const index = (p / 100) * (arr.length + 1);
+    if (Math.floor(index) === index) {
+        return arr[index];
+    } else {
+        const lower = arr[Math.floor(index)];
+        const upper = arr[Math.ceil(index)];
+        return lower + (upper - lower) * (index - Math.floor(index));
+    }
+}
+
 class Metric {
     withinMultiLineComment: boolean; 
     currentLineIdArray: Array<string>;
@@ -187,10 +198,10 @@ class Metric {
     }
     
     // TODO: doooo
-    analyzeMetrics(metrics: Array<Line>, options: Partial<PrettierOptions>) {
+    analyzeMetrics(lines: Array<Line>, options: Partial<PrettierOptions>) {
         let result: string = "";
     
-        let totalLines = metrics.length;
+        let totalLines = lines.length;
         //average metrics
         let totalLineLength = 0;
         let totalOpenBrackets = 0;
@@ -205,8 +216,8 @@ class Metric {
         let badIDExists = false;
         let badIDs = new Map<number, Array<string>>();
     
-        for (let i = 0; i < metrics.length; i++) {
-            const line = metrics[i];
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
             totalLineLength += line.metrics.lineLength;
             totalOpenBrackets += line.metrics.openBrackCount;
             totalMemAccess += line.metrics.memAccessCount;
@@ -244,37 +255,65 @@ class Metric {
                     break;
             }
         }
-    
-        let averageLineLength = totalLineLength / totalLines;
-        let averageOpenBrackets = totalOpenBrackets / totalLines;
-        let averageMemAccess = totalMemAccess / totalLines;
-        let averageIDCount = totalIDCount / totalLines;
+
+        let averageLineLength = Math.round((totalLineLength / totalLines) * 1000) / 1000;
+        let averageOpenBrackets = Math.round((totalOpenBrackets / totalLines) * 1000) / 1000;
+        let averageMemAccess = Math.round((totalMemAccess / totalLines) * 1000) / 1000;
+        let averageIDCount = Math.round((totalIDCount / totalLines) * 1000) / 1000;
     
         //comparing empty lines to everything else (taking account of lines that have comments and/or code)
-        let whitespaceRatio = emptyLines / (codeOnlyLines + commentAndCodeLines + commentOnlyLines);
+        let whitespaceRatio = Math.round((emptyLines / (codeOnlyLines + commentAndCodeLines + commentOnlyLines)) * 100000) / 100000;
     
         //comparing lines of comments to solely lines of code
-        let commentToCodeRatio = commentOnlyLines / codeOnlyLines;
+        let commentToCodeRatio = Math.round((commentOnlyLines / codeOnlyLines) * 100000) / 100000;
     
         //Interpreting results:
     
         result += "Results:\n\n";
+        // result += "Total Metrics:\n";
+        // result += "Total Line Length: " + totalLineLength + "\n";
+        // result += "Total Open Brackets: " + totalOpenBrackets + "\n";
+        // result += "Total Member Access: " + totalMemAccess + "\n";
+        // result += "Total Identifier Count: " + totalIDCount + "\n";
+        // result += "Total Lines: " + totalLines + "\n\n";
         result += "Metric: Your Data / Threshold\n"
+        result += "--------------------------------\n"
         result += "Average line length: " + averageLineLength + " / " + options.lineLengthRead + "\n";
-        result += "Average open brackets: " + averageOpenBrackets + " / " + options.nestingCountRead + "\n";
-        result += "Average member access: " + averageMemAccess + " / " + options.memAccessRead + "\n";
-        result += "Average identifier count: " + averageIDCount + " / " + options.IDCountRead + "\n";
+        result += "Average open brackets per line: " + averageOpenBrackets + " / " + options.nestingCountRead + "\n";
+        result += "Average member access per line: " + averageMemAccess + " / " + options.memAccessRead + "\n";
+        result += "Average identifier count per line: " + averageIDCount + " / " + options.IDCountRead + "\n";
         result += "Whitespace ratio: " + whitespaceRatio + " / " + options.whitespaceRatioRead + "\n";
         result += "Comment to code ratio: " + commentToCodeRatio + " / " + options.commentToCodeRatioRead + "\n\n";
         
         let statAnalysisOut: string = "";
     
+        //checking if following metrics break and run stat analysis
         if (typeof options.lineLengthRead === 'number'){
             if (averageLineLength > options.lineLengthRead) {
                 result +=  "Your average line length of " + averageLineLength + " is longer than the recommended " + options.lineLengthRead + ". Consider shortening your lines.\n";
                 
                 //run stat analysis on line length to find outlier
                 //if stat analysis finds outlier, add line number to statAnalysisOut
+                const lineLengths = lines.map(line => line.metrics.lineLength);
+                lineLengths.sort((a, b) => a-b); // sort in ascending order
+
+                const Q1 = percentile(lineLengths, 25);
+                const Q3 = percentile(lineLengths, 75);
+                const IQR = Q3 - Q1;
+                const upperBound = Q3 + 1.5 * IQR;
+
+                let outlier = false;
+                
+                for (let i = 0; i < lines.length; i++){
+                    if (lines[i].metrics.lineLength > upperBound){
+                        statAnalysisOut += "Line " + lines[i].lineNum + ": exceeds the recommended number of characters by " + (lines[i].metrics.lineLength - upperBound) + ".\n";
+                        outlier = true;
+                    }
+                }
+
+                if(outlier){
+                    statAnalysisOut += "\n";
+                }
             }
         }
     
@@ -283,15 +322,55 @@ class Metric {
                 result += "Your average number of open brackets of " + averageOpenBrackets + " is greater than the recommended " + options.nestingCountRead + ". Consider utilizing fewer open brackets.\n";
                 
                 //run stat analysis on open brackets to find outlier
+                
+                const openBrackets = lines.map(line => line.metrics.openBrackCount);
+                openBrackets.sort((a, b) => a-b); // sort in ascending order
+
+                const Q1 = percentile(openBrackets, 25);
+                const Q3 = percentile(openBrackets, 75);
+                const IQR = Q3 - Q1;
+                const upperBound = Q3 + 1.5 * IQR;
+
+                let outlier = false;
+
+                for (let i = 0; i < lines.length; i++){
+                    if (lines[i].metrics.openBrackCount > upperBound){
+                        outlier = true;
+                        statAnalysisOut += "Line " + lines[i].lineNum + ": exceeds the recommended number of open brackets by " + (lines[i].metrics.openBrackCount - options.nestingCountRead) + ".\n"; 
+                    }
+                }
+
+                if(outlier){
+                    statAnalysisOut += "\n";
+                }
             }
         }
     
         if (typeof options.memAccessRead === 'number'){
             if (averageMemAccess > options.memAccessRead) {
                 result += "Your average number of member access operators of " + averageMemAccess + " is greater than the recommended " + options.memAccessRead + ". Consider utilizing fewer member access operators.\n";
-    
                 
                 //run stat analysis on member access to find outlier
+                const memAccess = lines.map(line => line.metrics.memAccessCount);
+                memAccess.sort((a, b) => a-b); // sort in ascending order
+
+                const Q1 = percentile(memAccess, 25);
+                const Q3 = percentile(memAccess, 75);
+                const IQR = Q3 - Q1;
+                const upperBound = Q3 + 1.5 * IQR;
+
+                let outlier = false;
+
+                for (let i = 0; i < lines.length; i++){
+                    if (lines[i].metrics.memAccessCount > upperBound){
+                        outlier = true;
+                        statAnalysisOut += "Line " + lines[i].lineNum + ": exceeds the recommended number of member access operators by " + (lines[i].metrics.memAccessCount - options.memAccessRead) + ".\n"; 
+                    }
+                }
+
+                if(outlier){
+                    statAnalysisOut += "\n";
+                }
             }
         }
     
@@ -300,39 +379,67 @@ class Metric {
                 result += "Your average number of identifiers of " + averageIDCount + " is greater than the recommended " + options.IDCountRead + ". Consider using fewer identifiers in the same line.\n";
     
                 //run stat analysis on ID count to find outlier
-    
-    
+                const idCount = lines.map(line => line.metrics.idCount);
+                idCount.sort((a, b) => a-b); // sort in ascending order
+
+                const Q1 = percentile(idCount, 25);
+                const Q3 = percentile(idCount, 75);
+                const IQR = Q3 - Q1;
+                const upperBound = Q3 + 1.5 * IQR;
+                
+                let outlier = false;
+
+                for (let i = 0; i < lines.length; i++){
+                    if (lines[i].metrics.idCount > upperBound){
+                        outlier = true;
+                        statAnalysisOut += "Line " + lines[i].lineNum + ": exceeds the recommended number of identifiers by " + (lines[i].metrics.idCount - options.IDCountRead) + ".\n"; 
+                    }
+                }
+
+                if(outlier){
+                    statAnalysisOut += "\n";
+                }
+                
             }
         }
     
-        if (badIDExists) {
-            //use map to get line numbers and bad ids
-            // line x: id1, id2, id3. 
-            result += "The following line(s) have IDs that are too short, harming future readability. Consider lengthening them:\n"
-        }
-    
         if (typeof options.whitespaceRatioRead === 'number'){
-            if (whitespaceRatio > options.whitespaceRatioRead) {
-                result += "Your ratio of whitespace lines to written lines of " + whitespaceRatio + " exceeds the recommended " + options.whitespaceRatioRead + ". Consider reducing the number of whitespace lines within your code.\n";
-    
-                
+            if (whitespaceRatio < options.whitespaceRatioRead) {
+                result += "Your ratio of whitespace lines to written lines of " + whitespaceRatio + " does not meet the recommended ratio of " + options.whitespaceRatioRead + ". Consider adding more whitespace to your code.\n";
             }
         }
         
         if (typeof options.commentToCodeRatioRead === 'number'){
-            if (commentToCodeRatio > options.commentToCodeRatioRead) {
-                result += "Your ratio of comment lines to code lines of " + commentToCodeRatio + " exceeds the recommended " + options.commentToCodeRatioRead + ". Consider adding more comments to your code.\n\n"
-    
-                
+            if (commentToCodeRatio < options.commentToCodeRatioRead) {
+                result += "Your ratio of comment lines to code lines of " + commentToCodeRatio + " does not meet the recommended ratio of " + options.commentToCodeRatioRead + ". Consider adding more comments to your code.\n\n"
             }
         }
         
         if (statAnalysisOut.length > 0) {
             result += "The following line(s) are outliers in their respective metrics:\n\n" + statAnalysisOut;
         }
+
+        if (badIDExists) {
+            //use map to get line numbers and bad ids
+            // line x: id1, id2, id3. 
+            result += "The following line(s) have IDs that are too short, harming future readability. Consider lengthening them:\n"
+            
+            for (let [key, value] of badIDs){
+                result += "Line " + key + ": ";
+                for (let i = 0; i < value.length; i++){
+                    result += value[i];
+                    if (i != value.length - 1){
+                        result += ", ";
+                    }
+                }
+                result += "\n";
+            }
+
+        }
         
         
     
         return result;
     }
+    
 }
