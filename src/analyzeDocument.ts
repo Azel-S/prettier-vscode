@@ -128,15 +128,40 @@ class Metric {
         this.currentLineIdArray = Object.assign([], ids); 
         return ids.filter(Boolean);
     }
+
+    private cutStringsAndComments(line:string): string {
+        const type = this.getLineType(line);
+        line = line.replace(/'.*?'|".*?"/g, "");
+
+        if (type === LineType.COMMENT_ONLY) return "";
+        else if (type === LineType.COMMENT_AND_CODE) {
+            line = line.replace(/\/\/.*/g,"");
+            line = line.replace(/\/\*.*\*\//g, "");
+            line = line.replace(/\/\*.*/g, "");
+        }
+
+        return line;
+    }
     
     // TODO: do
     getOpenBracketsCount(line: string): number {
-        return line.length - line.length;
+        line = this.cutStringsAndComments(line);
+
+        const brackets = line.match(/{/g);
+
+        if (brackets == null) return 0;
+
+        return brackets.length;
     }
     
     // TODO: doo
     getMemAccessCount(line: string): number {
-        return line.length - line.length;
+        line = this.cutStringsAndComments(line);
+
+        const memAccesses = line.match(/(?=([^.]\.[a-zA-Z_]))/g);
+
+        if (memAccesses == null) return 0;
+        else return memAccesses.length;
     }
     
     getLineType(line: string): LineType {
