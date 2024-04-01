@@ -133,7 +133,24 @@ class Metric {
             }
         }
         else if (fileExtension === "javascript"){
+            const declarationIdRegex = /(?:const|let|var)\s*{([\w,\s]+)}|(?:const|let|var)\s+(\w+)|(?:function\*?|get|set)\s+(\w+)|(\w+)\s*\((?!.*?\)\s*;)|(?:class)\s+(\w+)/;
 
+            const match = line.match(declarationIdRegex);
+
+            if (match !== null) {
+                if (match[1] != undefined) {
+                    // bracket stuff
+                    ids = ids.concat(match[1].split(',').map(id => id.trim()));
+                } else if (match[2] != undefined) {
+                    ids.push(match[2]);
+                } else if (match[3] != undefined) {
+                    ids.push(match[3]);
+                } else if (match[4] != undefined) {
+                    ids.push(match[4]);
+                } else if (match[5] != undefined) {
+                    ids.push(match[5]);
+                }
+            } 
         }
         
         this.currentLineIdArray = Object.assign([], ids); 
