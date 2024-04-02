@@ -50,11 +50,13 @@ function percentile(arr: number[], p: number): number {
 
 class Metric {
     withinMultiLineComment: boolean; 
+    currentLineIdDeclarations: Array<string>;
     currentLineIdArray: Array<string>;
 
     constructor() {
         this.withinMultiLineComment = false; 
         this.currentLineIdArray = []; 
+        this.currentLineIdDeclarations = [];
     }
 
     
@@ -89,7 +91,7 @@ class Metric {
     getIDState(line: string, options: Partial<PrettierOptions>): boolean {
         //use options.IDMinLengthRead for checking. True means ID is longer than min length
 
-        for (const value of this.currentLineIdArray){
+        for (const value of this.currentLineIdDeclarations){
             if (options.IDMinLengthRead != undefined &&  value.length < options.IDMinLengthRead){
                 return true;
             }
@@ -102,6 +104,7 @@ class Metric {
     getIDs(line: string): Array<string> {
         const fileExtension = window.activeTextEditor?.document.languageId; 
         let ids: Array<string> = [];
+        let declarations: Array<string> = [];
 
         if (fileExtension === "typescript"){
 
@@ -115,12 +118,15 @@ class Metric {
             if ((match = declarationIdRegex.exec(line)) !== null ){
                 if (match[2] != undefined){
                     ids.push(match[2]);
+                    declarations.push(match[2]);
                 }
                 else if(match[3] != undefined){
                     ids.push(match[3]);
+                    declarations.push(match[3]);
                 }
                 else if(match[7] != undefined){
                     ids.push(match[7]);
+                    declarations.push(match[7]);
                 }
             }
 
@@ -130,30 +136,69 @@ class Metric {
             const destructMatch = destructAssignRegex.exec(line);
             if (destructMatch){
                 ids = ids.concat(destructMatch[1].split(',').map(id => id.trim()));
+                declarations = declarations.concat(destructMatch[1].split(',').map(id => id.trim()));
             }
         }
         else if (fileExtension === "javascript"){
-            const declarationIdRegex = /(?:const|let|var)\s*{([\w,\s]+)}|(?:const|let|var)\s+(\w+)|(?:function\*?|get|set)\s+(\w+)|(\w+)\s*\((?!.*?\)\s*;)|(?:class)\s+(\w+)/;
-
+            line = this.cutStringsAndComments(line);
+            
+            // declarations
+            const declarationIdRegex = /(?:const|let|var)\s*{([\w,\s]+)}|(?:const|let|var)\s+(\w+)((?:\s*=\s*function\s*(\w*)\s*\()([\w,\s]*)\))?|(?:function\*?|get|set)\s+(\w+)\s*\(([\w,\s]*)\)|(\w+)\s*\(([\w,\s]*)\)(?!.*;)|(?:class)\s+(\w+)|(\w+):/;
             const match = line.match(declarationIdRegex);
 
             if (match !== null) {
                 if (match[1] != undefined) {
                     // bracket stuff
-                    ids = ids.concat(match[1].split(',').map(id => id.trim()));
+                    declarations = declarations.concat(match[1].split(',').map(id => id.trim()));
                 } else if (match[2] != undefined) {
-                    ids.push(match[2]);
-                } else if (match[3] != undefined) {
-                    ids.push(match[3]);
-                } else if (match[4] != undefined) {
-                    ids.push(match[4]);
-                } else if (match[5] != undefined) {
-                    ids.push(match[5]);
+                    //let, const, var
+                    declarations.push(match[2]);
+
+                    // inline func declaration
+                    if (match[4] != undefined && match[5] != undefined) {
+                        if (match[4] !== "") declarations.push(match[4]);
+                        if (match[5] !== "") declarations = declarations.concat(match[5].split(',').map(id => id.trim()));
+                    }
+                } else if (match[6] != undefined) {
+                    // non-class function declarations
+                    // function name
+                    declarations.push(match[6]);
+                    //parameter names
+                    if (match[7] !== "") declarations = declarations.concat(match[7].split(',').map(id => id.trim()));
+                } else if (match[8] != undefined) {
+                    // inclass/nonconst func declaration
+                    if (match[8] !== "function") declarations.push(match[8]);
+                    if (match[9] !== "") declarations = declarations.concat(match[9].split(',').map(id => id.trim()));
+                } else if (match[10] != undefined) {   
+                    //classes
+                    declarations.push(match[10]);
+                } else if (match[11] != undefined) {
+                    // property declarations
+                    declarations.push(match[11]);
                 }
             } 
+            
+            const keyWords = new Set(["get", "set", "await", "const", "let", "var", "function", "function*", "class", "async", "new", "Set", "return", "break", "case", "catch", "continue", "if", "else", "undefined", "for", "in", "export", "do", "import", "try", "throw", "instanceof"]);
+
+            // remove comments and string literals
+            //remove booleans and numerical literals
+            line = line.replace(/true|false|[^\w]-?[0-9](\.[0-9])?/g, "");
+
+            //split by operators
+            line = line.replace(/[.*\/,+=\-()^<>{}\[\];:]/g, " ");
+            let identifiers = line.split(" ");
+
+            for (let i = 0; i < identifiers.length; i++) {
+                identifiers[i] = identifiers[i].trim();
+                if (identifiers[i] !== "" && !keyWords.has(identifiers[i])) {
+                    ids.push(identifiers[i]);
+                }
+            }                
+            
         }
         
         this.currentLineIdArray = Object.assign([], ids); 
+        this.currentLineIdDeclarations = Object.assign([], declarations);
         return ids.filter(Boolean);
     }
 
