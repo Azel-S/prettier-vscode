@@ -195,6 +195,17 @@
           "markdownDescription": "%ext.config.allmanStyle%",
           "scope": "resource"
         },
+        "prettier.classMemberOrder": {
+          "type": "string",
+          "enum": [
+            "none",
+            "private first",
+            "public first"
+          ],
+          "default": "none",
+          "markdownDescription": "%ext.config.classMemberOrder%",
+          "scope": "resource"
+        },
         "prettier.elseStatementNewLine": {
           "type": "boolean",
           "default": true,
