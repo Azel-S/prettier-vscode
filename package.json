@@ -177,8 +177,8 @@
         },
         "prettier.matrixArray": {
           "type": "boolean",
-          "default": true,
-          "markdownDescription": "%ext.config.allmanStyle%",
+          "default": false,
+          "markdownDescription": "%ext.config.matrixArray%",
           "scope": "resource"
         },
         "prettier.documentSelectors": {
