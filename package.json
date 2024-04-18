@@ -177,8 +177,8 @@
         },
         "prettier.matrixArray": {
           "type": "boolean",
-          "default": true,
-          "markdownDescription": "%ext.config.allmanStyle%",
+          "default": false,
+          "markdownDescription": "%ext.config.matrixArray%",
           "scope": "resource"
         },
         "prettier.documentSelectors": {
@@ -199,6 +199,17 @@
           "type": "boolean",
           "default": false,
           "markdownDescription": "%ext.config.getSetOneLine%",
+          "scope": "resource"
+        },
+        "prettier.classMemberOrder": {
+          "type": "string",
+          "enum": [
+            "none",
+            "private first",
+            "public first"
+          ],
+          "default": "none",
+          "markdownDescription": "%ext.config.classMemberOrder%",
           "scope": "resource"
         },
         "prettier.elseStatementNewLine": {
@@ -293,6 +304,48 @@
           "type": "integer",
           "default": 80,
           "markdownDescription": "%ext.config.printWidth%",
+          "scope": "resource"
+        },
+        "prettier.lineLengthRead": {
+          "type": "number",
+          "default": 50,
+          "markdownDescription": "%ext.config.lineLengthRead%",
+          "scope": "resource"
+        },
+        "prettier.nestingCountRead": {
+          "type": "number",
+          "default": 3,
+          "markdownDescription": "%ext.config.nestingCountRead%",
+          "scope": "resource"
+        },
+        "prettier.memAccessRead": {
+          "type": "number",
+          "default": 5,
+          "markdownDescription": "%ext.config.memAccessRead%",
+          "scope": "resource"
+        },
+        "prettier.commentToCodeRatioRead": {
+          "type": "number",
+          "default": 0.3,
+          "markdownDescription": "%ext.config.commentToCodeRatioRead%",
+          "scope": "resource"
+        },
+        "prettier.whitespaceRatioRead": {
+          "type": "number",
+          "default": 0.3,
+          "markdownDescription": "%ext.config.whitespaceRatioRead%",
+          "scope": "resource"
+        },
+        "prettier.IDCountRead": {
+          "type": "number",
+          "default": 4,
+          "markdownDescription": "%ext.config.IDCountRead%",
+          "scope": "resource"
+        },
+        "prettier.IDMinLengthRead": {
+          "type": "number",
+          "default": 2,
+          "markdownDescription": "%ext.config.IDMinLengthRead%",
           "scope": "resource"
         },
         "prettier.tabWidth": {
@@ -501,6 +554,11 @@
       {
         "command": "prettier.forceFormatDocument",
         "title": "%ext.command.forceFormatDocument.title%",
+        "when": "editorFocus"
+      },
+      {
+        "command": "prettier.analyzeDocument",
+        "title": "%ext.command.analyzeDocument.title%",
         "when": "editorFocus"
       }
     ]

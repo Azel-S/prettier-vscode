@@ -68,12 +68,17 @@ export function activate(context: ExtensionContext) {
         "prettier.forceFormatDocument",
         editService.forceFormatDocument
       );
+      const analyzeDocumentCommand = commands.registerCommand(
+        "prettier.analyzeDocument",
+        editService.analyzeDocument
+      );
 
       context.subscriptions.push(
         editService,
         createConfigFileCommand,
         openOutputCommand,
         forceFormatDocumentCommand,
+        analyzeDocumentCommand,
         ...editService.registerDisposables()
       );
     })

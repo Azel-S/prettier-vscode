@@ -27,6 +27,7 @@ import {
 } from "./types";
 import { getConfig, isAboveV3 } from "./util";
 import { PrettierInstance } from "./PrettierInstance";
+import { getAnalysis } from "./analyzeDocument";
 
 interface ISelectors {
   rangeLanguageSelector: ReadonlyArray<DocumentFilter>;
@@ -72,7 +73,7 @@ export default class PrettierEditService implements Disposable {
     private moduleResolver: ModuleResolverInterface,
     private loggingService: LoggingService,
     private statusBar: StatusBar
-  ) {}
+  ) { }
 
   public registerDisposables(): Disposable[] {
     const packageWatcher = workspace.createFileSystemWatcher("**/package.json");
@@ -133,6 +134,114 @@ export default class PrettierEditService implements Disposable {
       });
     } catch (e) {
       this.loggingService.logError("Error formatting document", e);
+    }
+  };
+
+  public analyzeDocument = async () => {
+    try {
+      const editor = window.activeTextEditor;
+      if (!editor) {
+        this.loggingService.logInfo(
+          "No active document. Nothing was formatted."
+        );
+        return;
+      }
+
+      const { fileName, uri, languageId } = editor.document;
+      const vscodeConfig = getConfig(uri);
+      
+      const resolvedConfig = await this.moduleResolver.getResolvedConfig(editor.document, vscodeConfig);
+      if (resolvedConfig === "error") {
+        this.statusBar.update(FormatterStatus.Error);
+        return;
+      }
+      if (resolvedConfig === "disabled") {
+        this.statusBar.update(FormatterStatus.Disabled);
+        return;
+      }
+
+      const prettierInstance = await this.moduleResolver.getPrettierInstance(
+        fileName
+      );
+      this.loggingService.logInfo("PrettierInstance:", prettierInstance);
+
+      if (!prettierInstance) {
+        this.loggingService.logError(
+          "Prettier could not be loaded. See previous logs for more information."
+        );
+        this.statusBar.update(FormatterStatus.Error);
+        return;
+      }
+
+      let resolvedIgnorePath: string | undefined;
+      if (vscodeConfig.ignorePath) {
+        resolvedIgnorePath = await this.moduleResolver.getResolvedIgnorePath(
+          fileName,
+          vscodeConfig.ignorePath
+      );
+        if (resolvedIgnorePath) {
+          this.loggingService.logInfo(
+            `Using ignore file (if present) at ${resolvedIgnorePath}`
+          );
+        }
+    } 
+
+      let fileInfo: PrettierFileInfoResult | undefined;
+      if   (fileName) {
+        fileInfo = await prettierInstance.getFileInfo(fileName, {
+          ignorePath: resolvedIgnorePath,
+          plugins: resolvedConfig?.plugins?.filter(
+            (item): item is string => typeof item === "string"
+          ),
+          resolveConfig: true,
+        withNodeModules: vscodeConfig.withNodeModules,
+      });
+      this.loggingService.logInfo("File Info:", fileInfo);
+    }
+
+    let parser: PrettierBuiltInParserName | string | undefined;
+    if (fileInfo && fileInfo.inferredParser) {
+      parser = fileInfo.inferredParser;
+    } else if (languageId !== "plaintext") {
+      // Don't attempt VS Code language for plaintext because we never have
+      // a formatter for plaintext and most likely the reason for this is
+      // somebody has registered a custom file extension without properly
+      // configuring the parser in their prettier config.
+      this.loggingService.logWarning(
+        `Parser not inferred, trying VS Code language.`
+      );
+      const { languages } = await prettierInstance.getSupportInfo({
+        plugins: [],
+      });
+      parser = getParserFromLanguageId(languages, uri, languageId);
+    }
+
+    if (!parser) {
+      this.loggingService.logError(
+        `Failed to resolve a parser, skipping file. If you registered a custom file extension, be sure to configure the parser.`
+      );
+      this.statusBar.update(FormatterStatus.Error);
+      return;
+    }
+
+      const options = this.getPrettierOptions(
+        editor.document.fileName,
+        parser as PrettierBuiltInParserName,
+        vscodeConfig,
+        resolvedConfig,
+        {force: false}
+      );
+
+      // getAnalysis does the heavy lifting.
+      workspace.openTextDocument({
+        content: getAnalysis(editor.document.getText(), options),
+        language: "text"
+      }).then(document => {
+        window.showTextDocument(document);
+      });
+
+    } catch (e) {
+      this.loggingService.logError("Error analyzing document", e);
     }
   };
 
@@ -310,20 +419,20 @@ export default class PrettierEditService implements Disposable {
       ? this.allExtensions.length === 0
         ? []
         : [
-            {
-              pattern: `${uri.fsPath}/**/*.{${this.allExtensions
-                .map((e) => e.substring(1))
-                .join(",")}}`,
-              scheme: "file",
-            },
-          ]
+          {
+            pattern: `${uri.fsPath}/**/*.{${this.allExtensions
+              .map((e) => e.substring(1))
+              .join(",")}}`,
+            scheme: "file",
+          },
+        ]
       : [];
 
     const customLanguageSelectors: DocumentFilter[] = uri
       ? documentSelectors.map((pattern) => ({
-          pattern: `${uri.fsPath}/${pattern}`,
-          scheme: "file",
-        }))
+        pattern: `${uri.fsPath}/${pattern}`,
+        scheme: "file",
+      }))
       : [];
 
     const defaultLanguageSelectors: DocumentFilter[] = [
@@ -536,6 +645,7 @@ export default class PrettierEditService implements Disposable {
       vsOpts.multiEmptyLine = vsCodeConfig.multiEmptyLine;
       vsOpts.retainBlankLines = vsCodeConfig.retainBlankLines;
       vsOpts.selectorsSameLine = vsCodeConfig.selectorsSameLine;
+      vsOpts.classMemberOrder = vsCodeConfig.classMemberOrder;
       vsOpts.endOfLine = vsCodeConfig.endOfLine;
       vsOpts.htmlWhitespaceSensitivity = vsCodeConfig.htmlWhitespaceSensitivity;
       vsOpts.insertPragma = vsCodeConfig.insertPragma;
@@ -544,6 +654,13 @@ export default class PrettierEditService implements Disposable {
       vsOpts.jsxBracketSameLine = vsCodeConfig.jsxBracketSameLine;
       vsOpts.jsxSingleQuote = vsCodeConfig.jsxSingleQuote;
       vsOpts.printWidth = vsCodeConfig.printWidth;
+      vsOpts.lineLengthRead = vsCodeConfig.lineLengthRead;
+      vsOpts.nestingCountRead = vsCodeConfig.nestingCountRead;
+      vsOpts.memAccessRead = vsCodeConfig.memAccessRead;
+      vsOpts.commentToCodeRatioRead = vsCodeConfig.commentToCodeRatioRead;
+      vsOpts.whitespaceRatioRead = vsCodeConfig.whitespaceRatioRead;
+      vsOpts.IDCountRead = vsCodeConfig.IDCountRead;
+      vsOpts.IDMinLengthRead = vsCodeConfig.IDMinLengthRead;
       vsOpts.proseWrap = vsCodeConfig.proseWrap;
       vsOpts.quoteProps = vsCodeConfig.quoteProps;
       vsOpts.requirePragma = vsCodeConfig.requirePragma;
