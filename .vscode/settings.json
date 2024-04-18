@@ -25,5 +25,6 @@
     "stylelint",
     "userdata",
     "vsce"
-  ]
+  ],
+  "cmake.sourceDirectory": "C:/Users/Lauren/VSCode/OpenMindedPrettier/prettier-vscode/node_modules/bare-fs"
 }
