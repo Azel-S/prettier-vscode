@@ -308,19 +308,19 @@
         },
         "prettier.lineLengthRead": {
           "type": "number",
-          "default": 50,
+          "default": 40,
           "markdownDescription": "%ext.config.lineLengthRead%",
           "scope": "resource"
         },
         "prettier.nestingCountRead": {
           "type": "number",
-          "default": 3,
+          "default": 1,
           "markdownDescription": "%ext.config.nestingCountRead%",
           "scope": "resource"
         },
         "prettier.memAccessRead": {
           "type": "number",
-          "default": 5,
+          "default": 1,
           "markdownDescription": "%ext.config.memAccessRead%",
           "scope": "resource"
         },
@@ -332,13 +332,13 @@
         },
         "prettier.whitespaceRatioRead": {
           "type": "number",
-          "default": 0.3,
+          "default": 0.2,
           "markdownDescription": "%ext.config.whitespaceRatioRead%",
           "scope": "resource"
         },
         "prettier.IDCountRead": {
           "type": "number",
-          "default": 4,
+          "default": 2,
           "markdownDescription": "%ext.config.IDCountRead%",
           "scope": "resource"
         },
