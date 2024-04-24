@@ -18,8 +18,8 @@ export class StatusBar {
       StatusBarAlignment.Right,
       -1
     );
-    this.statusBarItem.name = "Prettier";
-    this.statusBarItem.text = "Prettier";
+    this.statusBarItem.name = "Prettier-er";
+    this.statusBarItem.text = "Prettier-er";
     this.statusBarItem.command = "prettier.openOutput";
     this.update(FormatterStatus.Ready);
     this.statusBarItem.show();
@@ -31,7 +31,7 @@ export class StatusBar {
    * @param icon The the icon to use
    */
   public update(result: FormatterStatus): void {
-    this.statusBarItem.text = `$(${result.toString()}) Prettier`;
+    this.statusBarItem.text = `$(${result.toString()}) Prettier-er`;
     switch (result) {
       case FormatterStatus.Ignore:
       case FormatterStatus.Warn:

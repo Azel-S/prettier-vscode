@@ -23,7 +23,7 @@
   "ext.config.semi": "在所有代码语句的末尾添加分号。",
   "ext.config.singleQuote": "使用单引号而不是双引号。",
   "ext.config.tabWidth": "指定一个制表符等于的空格数。",
-  "ext.config.title": "Prettier",
+  "ext.config.title": "Prettier-er",
   "ext.config.trailingComma": "指定添加尾后逗号的方式。\n选项：\n- `none` - 无尾后逗号。\n- `es5` - 在 ES5 中有效的尾后逗号（如对象与数组等）。\n- `all` - 尽可能添加尾后逗号（如函数的参数列表）。",
   "ext.config.useEditorConfig": "使用 `.editorconfig` 中的配置选项。详见 [`prettier.resolveConfig`](https://prettier.io/docs/en/api.html) 文档。",
   "ext.config.useTabs": "使用制表符缩进，而不是空格缩进。",

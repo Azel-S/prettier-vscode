@@ -28,7 +28,7 @@
   "ext.config.semi": "是否要在每一列的結尾加上分號。",
   "ext.config.singleQuote": "會使用單引號而非雙引號。",
   "ext.config.tabWidth": "每一個 tab 要使用多少個空格。",
-  "ext.config.title": "Prettier",
+  "ext.config.title": "Prettier-er",
   "ext.config.trailingComma": "在可能的情況下控制結尾的逗號。可用的選項：\n- `none` - 不要結尾逗號\n- `es5` - 只要合乎 ES5 規範就加上結尾逗號（物件、陣列等其他）\n- `all` - 只要可以就加上結尾逗號（函式引數）。",
   "ext.config.useEditorConfig": "在解析組態時是否要涵蓋 `.editorconfig` 。參閱 [`prettier.resolveConfig`](https://prettier.io/docs/en/api.html) 文件取得更多細節。",
   "ext.config.useTabs": "使用 tabs 來縮排。",
