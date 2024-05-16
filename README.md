@@ -1,6 +1,7 @@
-# Prettier Formatter for Visual Studio Code
+# Prettier-er Formatter for Visual Studio Code
 
-[Prettier](https://prettier.io/) is an opinionated code formatter. It enforces a consistent style by parsing your code and re-printing it with its own rules that take the maximum line length into account, wrapping code when necessary.
+[Prettier-er](https://github.com/OpenMindedPrettier) is an open-minded code formatter based on Prettier. It provides additional configuration options, allowing you to tailor the formatting rules to better suit your project's needs.
+
 
 <p align="center">
   <em>
@@ -33,37 +34,25 @@
     · Markdown
     · YAML
   </em>
-  <br />
-  <em>
-    <a href="https://prettier.io/docs/en/plugins.html">
-      Your favorite language?
-    </a>
-  </em>
 </p>
 
 <p align="center">
-  <a href="https://github.com/prettier/prettier-vscode/actions?query=workflow%3AMain">
-    <img alt="Build Status" src="https://github.com/prettier/prettier-vscode/workflows/Main/badge.svg?branch=main"></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">
-    <img alt="VS Code Marketplace Downloads" src="https://img.shields.io/visual-studio-marketplace/d/esbenp.prettier-vscode"></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode">
-    <img alt="VS Code Marketplace Installs" src="https://img.shields.io/visual-studio-marketplace/i/esbenp.prettier-vscode"></a>
-  <a href="#badge">
-    <img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square"></a>
-  <a href="https://twitter.com/PrettierCode">
-    <img alt="Follow Prettier on Twitter" src="https://img.shields.io/twitter/follow/prettiercode.svg?label=follow+prettier&style=flat-square"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=omp.prettier-er">
+    <img alt="VS Code Marketplace Downloads" src="https://img.shields.io/visual-studio-marketplace/d/omp.prettier-er"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=omp.prettier-er">
+    <img alt="VS Code Marketplace Installs" src="https://img.shields.io/visual-studio-marketplace/i/omp.prettier-er"></a>
 </p>
 
 ## Installation
 
-Install through VS Code extensions. Search for `Prettier - Code formatter`
+Install through VS Code extensions. Search for `Prettier-er`
 
-[Visual Studio Code Market Place: Prettier - Code formatter](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+[Visual Studio Code Market Place: Prettier-er - Code formatter](https://marketplace.visualstudio.com/items?itemName=omp.prettier-er)
 
 Can also be installed in VS Code: Launch VS Code Quick Open (Ctrl+P), paste the following command, and press enter.
 
 ```
-ext install esbenp.prettier-vscode
+ext install omp.prettier-er
 ```
 
 ### Default Formatter
@@ -72,33 +61,33 @@ To ensure that this extension is used over other extensions you may have install
 
 ```json
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "omp.prettier-er",
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "omp.prettier-er"
   }
 }
 ```
 
-If you want to disable Prettier on a particular language you can either create a `.prettierignore` file or you can use VS Code's `editor.defaultFormatter` settings.
+If you want to disable Prettier-er on a particular language you can either create a `.prettierignore` file or you can use VS Code's `editor.defaultFormatter` settings.
 
-The following will use Prettier for all languages except Javascript.
+The following will use Prettier-er for all languages except Javascript.
 
 ```json
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "omp.prettier-er",
   "[javascript]": {
     "editor.defaultFormatter": "<another formatter>"
   }
 }
 ```
 
-The following will use Prettier for only Javascript.
+The following will use Prettier-er for only Javascript.
 
 ```json
 {
   "editor.defaultFormatter": "<another formatter>",
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "omp.prettier-er"
   }
 }
 ```
@@ -113,43 +102,9 @@ Additionally, you can disable format on save for specific languages if you don't
 }
 ```
 
-### Prettier Resolution
-
-This extension will use prettier from your project's local dependencies (recommended). When the `prettier.resolveGlobalModules` is set to `true` the extension can also attempt to resolve global modules. Should prettier not be installed locally with your project's dependencies or globally on the machine, the version of prettier that is bundled with the extension will be used.
-
-To install prettier in your project and pin its version [as recommended](https://prettier.io/docs/en/install.html), run:
-
-```
-npm install prettier -D --save-exact
-```
-
-> NOTE: You will be prompted to confirm that you want the extension to load a Prettier module. This is done to ensure that you are not loading a module or script that is not trusted.
-
-### Prettier Version 3
-
-Prettier's preview version 3 is supported as of version 9.12.0. It is not included in the extension by default, but can be used by installing locally in your project. Version 10.0.0 of this extension will include prettier 3.0.0 after it is out of preview. To try version 3 now run the following in your project:
-
-```base
-npm i prettier@3.0.0-alpha.6 -D
-```
-
-### Plugins
-
-This extension supports [Prettier plugins](https://prettier.io/docs/en/plugins.html) when you are using a locally or globally resolved version of prettier. If you have Prettier and a plugin registered in your `package.json`, this extension will attempt to register the language and provide automatic code formatting for the built-in and plugin languages.
-
-## Configuration
-
-There are multiple options for configuring Prettier with this extension. You can use [VS Code settings](#prettier-settings), [prettier configuration files](https://prettier.io/docs/en/configuration.html), or an `.editorconfig` file. The VS Code settings are meant to be used as a fallback and are generally intended only for use on non-project files. **It is recommended that you always include a prettier configuration file in your project specifying all settings for your project.** This will ensure that no matter how you run prettier - from this extension, from the CLI, or from another IDE with Prettier, the same settings will get applied.
-
-Using [Prettier Configuration files](https://prettier.io/docs/en/configuration.html) to set formatting options is the recommended approach. Options are searched recursively down from the file being formatted so if you want to apply prettier settings to your entire project simply set a configuration in the root. Settings can also be configured through VS Code - however, these settings will only apply while running the extension, not when running prettier through the command line.
-
-### Configuring Default Options
-
-Some users may not wish to create a new Prettier config for every project or use the VS Code settings. In order to set a default configuration, set [`prettier.configPath`](https://github.com/prettier/prettier-vscode#prettierconfigpath). However, be careful, if this is set this value will always be used and local configuration files will be ignored.
-
 ### Visual Studio Code Settings
 
-You can use [VS Code settings](#prettier-settings) to configure prettier. Settings will be read from (listed by priority):
+You can use [VS Code settings](#prettier-er-settings) to configure prettier. Settings will be read from (listed by priority):
 
 1. [Prettier configuration file](https://prettier.io/docs/en/configuration.html)
 1. `.editorconfig`
@@ -217,7 +172,7 @@ This extension utilizes VS Code [Workspace Trust](https://code.visualstudio.com/
 
 ## Settings
 
-### Prettier Settings
+### Prettier-er Settings
 
 All prettier options can be configured directly in this extension. These settings are used as a fallback when no configuration file is present in your project, see the [configuration](#configuration) section of this document for more details. For reference on the options see the [prettier documentation](https://prettier.io/docs/en/options.html).
 
