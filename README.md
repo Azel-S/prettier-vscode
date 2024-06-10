@@ -146,8 +146,34 @@ Prettier-er primarily adds optional code style formatting choices that change ho
 
 ### Allman Style
 
+Allman style places a newline character before each '{' character. For example:
 
+Before:
+    function helloWorld(){
+      console.log("Hello, World!");
+    }
 
+After:
+    function helloWorld()
+    {
+      console.log("Hello, World!");
+    }
+
+### Force Object Break
+
+This setting forces object literals to exist on one or multiple lines, depending on the setting. The default setting preserves the existing Prettier functionality.
+
+### Matrix Array
+
+### Get Set One Line
+
+### Else Statement New Line
+
+### Multi-Empty Line
+
+### Retain Blank Lines
+
+## Selectors Same Line
 
 ## Settings
 
