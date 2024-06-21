@@ -138,9 +138,14 @@ OR
 ```
 > The above can also be followed to use the "Analyze Document (Metrics)" functionality.
 
-### Changes from Prettier-er
+# Changes from Prettier-er
 
-### Formatting Additions
+The changes Prettier-er makes to Prettier primarially come in two categories:
+
+1. Formatting Additions: These changes alter how the formatter behaves based on user settings.
+2. Readability Analysis: Prettier-er introduces a tool that gathers metrics that indicate readable code, and suggest changes to improve readability.
+
+## Formatting Additions
 
 Prettier-er primarily adds optional code style formatting choices that change how the formatter works. Each of these can be enabled in VS Code's workspace settings, and are enumerated in [Prettier-er Settings](#Prettier-er-Settings).
 
@@ -148,12 +153,14 @@ Prettier-er primarily adds optional code style formatting choices that change ho
 
 Allman style places a newline character before each '{' character. For example:
 
-Before:
+Disabled:
+
     function helloWorld(){
       console.log("Hello, World!");
     }
 
-After:
+Enabled:
+
     function helloWorld()
     {
       console.log("Hello, World!");
@@ -161,19 +168,158 @@ After:
 
 ### Force Object Break
 
-This setting forces object literals to exist on one or multiple lines, depending on the setting. The default setting preserves the existing Prettier functionality.
+This setting forces object literals to exist on one or multiple lines, depending on the setting. The default setting preserves the existing Prettier functionality. 
+
+Assume the following code for the next two settings:
+
+    const user = {
+      name: "John Doe",
+      age: 30,
+    };
+
+
+[Preserve Functionality](https://prettier.io/docs/en/rationale.html#multi-line-objects) determines the status of individual objects, meaning that each object literal must be set to single or multi line. The following two apply to all object literals
+
+forceSingleLine:
+
+    const user = { name: "John Doe", age: 30 };
+
+forceMultiLine:
+
+    const user = {
+      name: "John Doe",
+      age: 30,
+    };
+
+**NOTE:** A current bug does not apply allman style to object literal breaks. This will be addressed in the future.
 
 ### Matrix Array
+
+Matrix array allows for arrays to be initialized on multiple lines, as in a matrix. With the setting enabled:
+
+Formatting any array produces:
+
+    return [1, 2, 3, 4];
+
+To make the array into a matrix, place a newline after the final entry in any row, before the ','.
+
+    return [1, 2
+      , 3, 4];
+
+When formatting is run, the array will be ordered like a matrix:
+
+    return [
+      1, 2,
+      3, 4,
+    ];
 
 ### Get Set One Line
 
 ### Else Statement New Line
 
-### Multi-Empty Line
+Else Statement New Line places the `else` after the right bracket of the preceeding if statement, on a new line.
+
+Disabled:
+
+    if (true) {
+      console.log("Foo");
+    } else {
+      console.log("Bar");
+    }
+
+Enabled:
+
+    if (true) {
+      console.log("Foo");
+    }
+    else {
+      console.log("Bar");
+    }
+
+`else if` also works, behaving the same.
+
+### Multi Empty Line
+
+Multi Empty Line allows for multiple lines of whitespace at the start and end of blocks.
+This setting allows for code such as:
+
+    get bar() {
+
+
+      return [1];
+
+
+    }
+
+To remain spaced, instead of collapsing to:
+
+    get bar() {
+      return [1];
+    }
+
+when the setting is disabled.
 
 ### Retain Blank Lines
 
-## Selectors Same Line
+Similar to Multi Empty Line, Retain blank lines allows for whitespace anywhere in a document, instead of being collapsed into a single line. This allows for code such as:
+
+    get bar() {
+      let funArray = [1, 2, 3];
+
+
+
+      return funArray;
+    }
+
+To remain spaced, instead of collapsing to:
+
+    get bar() {
+      let funArray = [1, 2, 3];
+
+      return funArray;
+    }
+
+when the setting is disabled.
+
+### Selectors Same Line
+
+A css setting that allows multiple selectors to be on the same line.
+
+Disabled:
+
+    h1,
+    h2 {
+      margin: 3;
+    }
+
+Enabled:
+
+    h1, h2 {
+      margin: 3;
+    }
+
+## Readability Analysis
+
+Prettier-er includes a new tool developed to congregate metrics that indicate readability of code. Our Readability Analysis tool is entirely optional, and is intended to be used by new programmers who want guidance on how to make their code more readable, but can be useful to anyone.
+
+### How to use
+
+Readability analysis can be performed on any document in VS Code by running a command in the same way one formats a document using Prettier-er.
+
+In the searchbar at the top of your workspace, type '>' to reveal commands. From here, search for `Analyze Document (Metrics)`. Clicking on the result will cause the analysis to run.
+
+The tool uses 6 metrics to assess the readability of a document. These are:
+
+1. Average line length
+2. Average open brackets ('[', '{')
+3. Average member accessors
+4. Average identifier count
+5. Whitespace ratio
+6. Comment-to-code ratio
+
+Each of these metrics are found from your open document and compared against thresholds set in your workspace settings. These thresholds can be changed at any time.
+
+If any metric breaks a threshold (Your average line length is too high, or your ratio of comment to code is too low),
 
 ## Settings
 
