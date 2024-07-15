@@ -215,6 +215,10 @@ When formatting is run, the array will be ordered like a matrix:
 
 ### Get Set One Line
 
+Get Set One Line automatically compresses getter and setter functions to a single line if:
+
+1. The resulting line is under 
+
 ### Else Statement New Line
 
 Else Statement New Line places the `else` after the right bracket of the preceeding if statement, on a new line.
@@ -319,7 +323,7 @@ The tool uses 6 metrics to assess the readability of a document. These are:
 
 Each of these metrics are found from your open document and compared against thresholds set in your workspace settings. These thresholds can be changed at any time.
 
-If any metric breaks a threshold (Your average line length is too high, or your ratio of comment to code is too low),
+If any metric breaks a threshold (Your average line length is too high, or your ratio of comment to code is too low), a separate message will be shown, suggesting improvements.
 
 ## Settings
 
