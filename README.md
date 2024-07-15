@@ -215,9 +215,22 @@ When formatting is run, the array will be ordered like a matrix:
 
 ### Get Set One Line
 
+**Unstable: Get Set One Line currently does not function reliably. Further bug fixes will be needed to restore it.**
+
 Get Set One Line automatically compresses getter and setter functions to a single line if:
 
-1. The resulting line is under 
+1. The resulting line is below Prettier's printWidth character max.
+2. The function only contains one body line of code.
+
+For example,
+
+    get name {
+        return name;
+    }
+
+Will be formatted to,
+
+    get name { return name; }
 
 ### Else Statement New Line
 
@@ -324,6 +337,14 @@ The tool uses 6 metrics to assess the readability of a document. These are:
 Each of these metrics are found from your open document and compared against thresholds set in your workspace settings. These thresholds can be changed at any time.
 
 If any metric breaks a threshold (Your average line length is too high, or your ratio of comment to code is too low), a separate message will be shown, suggesting improvements.
+
+Below is a sample of the readability analysis
+![Sample Analysis Page](analysis1.png)
+
+This is the result of using `Analyze Document (Metrics)` on the `test.js` file shown in the tabs.
+All metrics are shown, alongside their threshold. Any that break the threshold (too high for the first 4, and too low for the last 2) get a message written at the bottom.
+
+In addition to metrics, any identifiers that below a certain length are pointed out, with their related line number. This recommendation exists to encourage more informative variable names, and the threshold for length can be changed, just like the other metrics.
 
 ## Settings
 
