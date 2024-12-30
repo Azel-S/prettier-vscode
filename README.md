@@ -149,7 +149,24 @@ The changes Prettier-er makes to Prettier primarially come in two categories:
 
 Prettier-er primarily adds optional code style formatting choices that change how the formatter works. Each of these can be enabled in VS Code's workspace settings, and are enumerated in [Prettier-er Settings](#Prettier-er-Settings).
 
+The formatting additions in Prettier-er are implemented in each language individually. Currently, support has been extended to:
+
+  - **JavaScript**
+    - TypeScript
+    - Flow
+    - JSX
+    - JSON
+  - **CSS**
+    - SCSS
+    - Less
+
+Each formatting option below will specify the languages supported by their primary language.
+
+> NOTE: Similar languages (like typescript and javascript) use the same formatter, meaning they will both have access to Prettier-er's additions. Only the primary languages seen in the list above will be shown. But any sub-language ought to work with it as well.
+
 ### Allman Style
+
+Supported languages: **Javascript**, **CSS**
 
 Allman style places a newline character before each '{' character. For example:
 
@@ -167,6 +184,8 @@ Enabled:
     }
 
 ### Force Object Break
+
+Supported languages: **Javascript**
 
 This setting forces object literals to exist on one or multiple lines, depending on the setting. The default setting preserves the existing Prettier functionality. 
 
@@ -195,6 +214,8 @@ forceMultiLine:
 
 ### Matrix Array
 
+Supported languages: **Javascript**
+
 Matrix array allows for arrays to be initialized on multiple lines, as in a matrix. With the setting enabled:
 
 Formatting any array produces:
@@ -215,6 +236,8 @@ When formatting is run, the array will be ordered like a matrix:
 
 ### Get Set One Line
 
+Supported languages: **Javascript**
+
 **Unstable: Get Set One Line currently does not function reliably. Further bug fixes will be needed to restore it.**
 
 Get Set One Line automatically compresses getter and setter functions to a single line if:
@@ -233,6 +256,8 @@ Will be formatted to,
     get name { return name; }
 
 ### Else Statement New Line
+
+Supported languages: **Javascript**, **CSS**
 
 Else Statement New Line places the `else` after the right bracket of the preceeding if statement, on a new line.
 
@@ -257,6 +282,8 @@ Enabled:
 
 ### Multi Empty Line
 
+Supported languages: **Javascript**
+
 Multi Empty Line allows for multiple lines of whitespace at the start and end of blocks.
 This setting allows for code such as:
 
@@ -277,6 +304,8 @@ To remain spaced, instead of collapsing to:
 when the setting is disabled.
 
 ### Retain Blank Lines
+
+Supported languages: **Javascript**
 
 Similar to Multi Empty Line, Retain blank lines allows for whitespace anywhere in a document, instead of being collapsed into a single line. This allows for code such as:
 
@@ -300,7 +329,9 @@ when the setting is disabled.
 
 ### Selectors Same Line
 
-A css setting that allows multiple selectors to be on the same line.
+Supported languages: **CSS**
+
+A setting that allows multiple selectors to be on the same line.
 
 Disabled:
 
