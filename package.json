@@ -2,7 +2,7 @@
   "name": "prettier-er",
   "displayName": "Prettier-er",
   "description": "A customizable version of the ever-popular code formatter called prettier.",
-  "version": "10.2.2",
+  "version": "10.2.3",
   "publisher": "omp",
   "author": "OpenMindedPrettier",
   "galleryBanner": {

@@ -4,6 +4,20 @@ All notable changes to the "prettier-vscode" extension will be documented in thi
 
 <!-- Check [Keep a Changelog](https://keepachangelog.com/) for recommendations on how to structure this file. -->
 
+## [10.2.3]
+
+Expanded Allmanstyle and elseStatementNewLine to CSS.
+
+## [10.2.2]
+
+Updated readme.md to Prettier-er information.
+
+## [10.2.1]
+
+Senior project update.
+- Added formatting options
+- Added readability analysis
+
 ## [Unreleased]
 
 Fixed the issue where VSCode was misrecognizing the path in output panel due to added quotes.
